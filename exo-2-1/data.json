@@ -1,0 +1,12 @@
+{
+    "marque": "Audi",
+    "roues": 4,
+    "nitro": true,
+    "kilometrage": 15000,
+    "places": {
+        "Conducteur": "Marc",
+        "Passager": "JC",
+        "Arriere": "Marsu",
+        "Coffre": "Gaelle"
+    }
+}
