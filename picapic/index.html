@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picapic</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="image-container">
+            <img id="player-img" src="images/pending.png" alt="Joueur">
+        </div>
+
+        <div id="score"></div>
+
+        <div id="game-over" class="hidden">
+            <div id="game-over-text">GAME OVER</div>
+            <button id="btn-restart">Recommencer</button>
+        </div>
+
+        <div class="controls">
+            <button id="btn-left">Pic Me</button>
+            <button id="btn-right">Repos</button>
+        </div>
+    </div>
+
+    <!-- Bibliothèque de logique du jeu -->
+    <script src="game.js"></script>
+    <!-- Interface utilisateur -->
+    <script src="script.js"></script>
+</body>
+</html>
