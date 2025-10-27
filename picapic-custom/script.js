@@ -15,7 +15,6 @@ const CONFIG = {
 
 
 let energie = CONFIG.ENERGIE_INITIALE;
-let etat = "normal";
 
 function updateImage(etat) {
     $playerImg.src = IMAGES[etat];
@@ -25,48 +24,43 @@ function udpadeButtons(etat) {
     if (etat === "attack") {
         $btnPicMe.disabled = true;
         $btnRepos.disabled = false;
-        return;
     } else if (etat === "repos") {
         $btnPicMe.disabled = false;
         $btnRepos.disabled = true;
-        return;
     } else if (etat === "mort") {
         $btnPicMe.disabled = true;
         $btnRepos.disabled = true;
-        return;
     } else { // etat === "normal"
         $btnPicMe.disabled = false;
         $btnRepos.disabled = false;
-        return;
     }
 }
 
 function doNormal() {
     console.log("normal");
-
-    const state = 'normal';
-    updateImage(state);
-    udpadeButtons(state);
-}
+    updateImage('normal');
+    udpadeButtons('normal');
+}  
 
 function doAttack() {
     console.log("attack");
-
-    const state = 'attack';
-    updateImage(state);
-    udpadeButtons(state);
-
+    updateImage('attack');
+    udpadeButtons('attack');
     updateEnergie(CONFIG.ATTACK_ENERGIE_LOST);
     if (energie > 0) setTimeout(doNormal, CONFIG.ATTACK_DURATION);
 }
 
+function doRestart() {
+    setEnergie(CONFIG.ENERGIE_INITIALE);
+    $btnRestart.classList.add('hidden');
+    $gameOver.classList.add('hidden');
+    doNormal();
+}
+
 function doRepos() {
     console.log("repos");
-
-    const state = 'repos';
-    updateImage(state);
-    udpadeButtons(state);
-
+    updateImage('repos');
+    udpadeButtons('repos');
     updateEnergie(CONFIG.REPOS_ENERGIE_GAIN);
     if (energie > 0) setTimeout(doNormal, CONFIG.REPOS_DURATION);
 }
@@ -74,10 +68,8 @@ function doRepos() {
 
 function doMort() {
     console.log("mort");
-
-    const state = 'mort';
-    updateImage(state);
-    udpadeButtons(state);
+    updateImage('mort');
+    udpadeButtons('mort');
     $btnRestart.classList.remove('hidden');
     $gameOver.classList.remove('hidden');
 }
@@ -91,15 +83,15 @@ function updateEnergie(diff) {
 // definir un chiffre pour l'energie
 function setEnergie(newEnergie) {
     energie = newEnergie;
-    $score.textContent = energie;
+    $score.textContent = "Energie:" + energie;
 
     if (energie <= 0) {
         energie = 0;
         $score.textContent = 0
         doMort();
     }
-
 }
+
 
 
 
@@ -109,24 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
     $btnRepos = document.getElementById('btn-right');
     $btnRestart = document.getElementById('btn-center');
     $gameOver = document.getElementById('game-over');
-
     $score = document.getElementById('score');
 
-    $btnPicMe.addEventListener('click', () => {
-        doAttack();
-    });
+    $btnPicMe.addEventListener('click', doAttack);
+    $btnRepos.addEventListener('click', doRepos);
+    $btnRestart.addEventListener('click', doRestart);
 
-    $btnRepos.addEventListener('click', () => {
-        doRepos();
-    });
-
-    $btnRestart.addEventListener('click', () => {
-        setEnergie(CONFIG.ENERGIE_INITIALE);
-        $btnRestart.classList.add('hidden');
-        $gameOver.classList.add('hidden');
-        doNormal();
-    });
-
-    $score.textContent = energie;
+    setEnergie(energie);
     doNormal();
 });
