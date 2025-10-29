@@ -549,7 +549,7 @@ function addBall() {
 }
 
 /**
- * Supprime la dernière bille avec animation de remontée
+ * Supprime la dernière bille avec disparition progressive
  */
 function removeBall() {
     if (bodies.length === 0) return;
@@ -557,54 +557,45 @@ function removeBall() {
     const body = bodies.pop();
     const mesh = meshes.pop();
 
+    if (!body || !mesh) return;
+
     console.log('🎱 Suppression d\'une bille avec animation...');
 
     // Décrémenter le compteur IMMÉDIATEMENT
     ballCount--;
     console.log('✓ ballCount décrémenté:', ballCount);
 
-    // Animation de remontée
-    animateBallRemoval(mesh, body);
+    // Retirer du monde physique
+    world.removeBody(body);
+
+    // Animation de disparition progressive
+    animateBallRemoval(mesh);
 }
 
 /**
- * Anime la remontée et la disparition d'un objet avant suppression
+ * Anime la disparition progressive d'un objet (fade out simple)
  */
-function animateBallRemoval(mesh, body) {
-    const startPos = mesh.position.clone();
-    const endPos = new THREE.Vector3(
-        (Math.random() - 0.5) * WORLD_WIDTH * 1.5,
-        WORLD_HEIGHT / 2 + Math.random() * 5,
-        (Math.random() - 0.5) * WORLD_DEPTH * 1.5
-    );
-
-    const duration = 1000; // 1 seconde
+function animateBallRemoval(mesh) {
+    const duration = 600; // 600ms de fade out
     const startTime = Date.now();
-
-    // Fonction d'easing (ease-out-cubic)
-    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
     // Ajouter un drapeau pour identifier les objets en suppression
     mesh.userData.isRemoving = true;
 
-    // Créer une boucle d'animation
+    // Créer une boucle d'animation de fade out
     const removeAnimationStep = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // Interpoler la position avec easing
-        mesh.position.lerpVectors(startPos, endPos, easeOutCubic(progress));
-
-        // Animer l'opacité (fade out)
+        // Animer l'opacité (fade out: 1 à 0)
         if (mesh.material) {
-            mesh.material.opacity = 1 - progress; // De 1 à 0
+            mesh.material.opacity = 1 - progress;
         }
 
         if (progress < 1) {
             requestAnimationFrame(removeAnimationStep);
         } else {
             // Suppression complète
-            world.removeBody(body);
             scene.remove(mesh);
             console.log('✓ Objet supprimé après animation');
         }
@@ -614,14 +605,15 @@ function animateBallRemoval(mesh, body) {
 }
 
 /**
- * Supprime toutes les billes
+ * Supprime toutes les billes (sans animation)
  */
 function removeAllBalls() {
+    // Retirer les animations en cours
     while (bodies.length > 0) {
         const body = bodies.pop();
         const mesh = meshes.pop();
-        world.removeBody(body);
-        scene.remove(mesh);
+        if (body) world.removeBody(body);
+        if (mesh) scene.remove(mesh);
     }
     ballCount = 0;
 }
@@ -643,9 +635,13 @@ function updateBallCount(targetCount) {
  * Boucle d'animation principale
  */
 let frameCount = 0;
-const cameraOrbitRadius = 90; // Distance de la caméra au centre (plus de recul)
+let cameraOrbitRadius = 90; // Distance de la caméra au centre (plus de recul)
+const cameraOrbitRadiusMin = 30; // Distance minimale (zoom avant)
+const cameraOrbitRadiusMax = 120; // Distance maximale (zoom arrière)
 const cameraOrbitSpeed = 0.3; // Vitesse de rotation (rad/s)
 let cameraAngle = 0; // Angle courant de la caméra
+let targetCameraRadius = 90; // Rayon cible pour le zoom
+let isZooming = false; // Flag pour savoir si on zoom
 
 function animate() {
     requestAnimationFrame(animate);
@@ -658,11 +654,13 @@ function animate() {
         const mesh = meshes[i];
         const body = bodies[i];
 
+        if (!mesh || !body) continue;
+
         mesh.position.copy(body.position);
         mesh.quaternion.copy(body.quaternion);
 
-        // Recycler les billes qui tombent trop bas
-        if (body.position.y < -WORLD_HEIGHT) {
+        // Recycler les billes qui tombent trop bas (sauf celles qui sont en cours de suppression)
+        if (body.position.y < -WORLD_HEIGHT && !mesh.userData.isRemoving) {
             // Repositionner la bille en haut
             const newX = (Math.random() - 0.5) * WORLD_WIDTH * 1.5;
             const newY = WORLD_HEIGHT / 2 + Math.random() * 5;
@@ -674,8 +672,21 @@ function animate() {
                 0,
                 (Math.random() - 0.5) * 10
             );
+            body.angularVelocity.set(
+                (Math.random() - 0.5) * 5,
+                (Math.random() - 0.5) * 5,
+                (Math.random() - 0.5) * 5
+            );
+
+            // Réinitialiser l'opacité quand l'objet est recyclé
+            if (mesh.material) {
+                mesh.material.opacity = 1;
+            }
         }
     }
+
+    // Interpoler le rayon vers le rayon cible pour un zoom smooth
+    cameraOrbitRadius += (targetCameraRadius - cameraOrbitRadius) * 0.1;
 
     // Rotation de la caméra autour du conteneur
     cameraAngle += cameraOrbitSpeed * 0.016; // 0.016 ≈ 1/60 secondes
@@ -712,6 +723,27 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
 }
+
+// ==================== GESTION DU ZOOM ====================
+
+/**
+ * Gère les appuis clavier pour le zoom
+ */
+document.addEventListener('keydown', (event) => {
+    if (event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        // Basculer entre zoom avant et zoom arrière
+        if (targetCameraRadius > 60) {
+            // Zoom avant
+            targetCameraRadius = cameraOrbitRadiusMin;
+            console.log('🔍 Zoom avant activé');
+        } else {
+            // Zoom arrière
+            targetCameraRadius = cameraOrbitRadiusMax;
+            console.log('🔍 Zoom arrière activé');
+        }
+    }
+});
 
 // ==================== INITIALISATION ====================
 document.addEventListener('DOMContentLoaded', () => {
