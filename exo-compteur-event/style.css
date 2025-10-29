@@ -1,0 +1,227 @@
+/* ==================== BODY & CANVAS ==================== */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+
+/* ==================== INTERFACE OVERLAY ==================== */
+.interface-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    backdrop-filter: blur(0px);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 2rem;
+}
+
+.interface-overlay .container,
+.interface-overlay .row,
+.interface-overlay .col-md-6,
+.interface-overlay .col-lg-5 {
+    pointer-events: auto;
+}
+
+/* ==================== CARD STYLING ==================== */
+.card {
+    max-width: 280px !important;
+    backdrop-filter: blur(12px);
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    transition: all 0.3s ease;
+    background: rgba(20, 20, 30, 0.25) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ==================== CARD BODY ==================== */
+.card-body {
+    padding: 1rem !important;
+}
+
+.card h1 {
+    font-size: 1.2rem !important;
+    margin-bottom: 0.75rem !important;
+    color: #e0e0e0 !important;
+    font-weight: 600;
+}
+
+/* ==================== COUNTER DISPLAY ==================== */
+.counter-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #f0f0f0;
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+    letter-spacing: 1px;
+}
+
+.display-box {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    transition: all 0.3s ease;
+    margin-bottom: 0.75rem !important;
+    border-radius: 12px !important;
+}
+
+/* ==================== BUTTONS STYLING ==================== */
+.btn-lg {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.95rem !important;
+    border-radius: 10px !important;
+    transition: all 0.2s ease !important;
+    border: none !important;
+    font-weight: 500;
+}
+
+.d-grid {
+    margin-bottom: 0.75rem !important;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-danger {
+    background-color: #5a4a5a !important;
+    color: #e8e8e8 !important;
+}
+
+.btn-danger:hover {
+    background-color: #6d5a6d !important;
+}
+
+.btn-success {
+    background-color: #4a6a5a !important;
+    color: #e8e8e8 !important;
+}
+
+.btn-success:hover {
+    background-color: #5a7a6a !important;
+}
+
+.btn-warning {
+    background-color: #6a6a4a !important;
+    color: #f0f0f0 !important;
+}
+
+.btn-warning:hover {
+    background-color: #7a7a5a !important;
+}
+
+/* ==================== ALERT STYLING ==================== */
+.alert {
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #d0d0d0 !important;
+    padding: 0.6rem !important;
+    margin-bottom: 0 !important;
+    font-size: 0.8rem !important;
+}
+
+.alert-info {
+    border-left: none !important;
+}
+
+.alert strong {
+    color: #f0f0f0;
+    font-weight: 600;
+}
+
+.alert small {
+    display: inline-block;
+    margin: 0.2rem 0;
+    color: #c0c0c0;
+}
+
+.alert .bi {
+    color: #d0d0d0;
+}
+
+/* ==================== ICONS ==================== */
+.bi {
+    vertical-align: -0.125em;
+    fill: currentColor;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 576px) {
+    .card {
+        max-width: 260px !important;
+    }
+
+    .card-body {
+        padding: 0.9rem !important;
+    }
+
+    .card h1 {
+        font-size: 1.1rem !important;
+        margin-bottom: 0.6rem !important;
+    }
+
+    .counter-value {
+        font-size: 2.5rem;
+    }
+
+    .display-box {
+        min-height: 90px;
+        margin-bottom: 0.6rem !important;
+    }
+
+    .btn-lg {
+        padding: 0.4rem 0.9rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    .alert {
+        padding: 0.5rem !important;
+        font-size: 0.75rem !important;
+    }
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes subtle-glow {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+    }
+}
+
+.display-box:hover {
+    animation: subtle-glow 2s ease-in-out infinite;
+}
