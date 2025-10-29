@@ -34,6 +34,11 @@ document.addEventListener('keydown', (event) => {
             break;
         case " ":
             $personnage.src = "images/attack.png";
+            moveCoordonnees(10, 10);
+            setTimeout(() => {
+                moveCoordonnees(-10, -10);
+                $personnage.src = "images/pending.png";
+            }, 1000);
             break;
     }
 
