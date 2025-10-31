@@ -1,0 +1,32 @@
+.cache {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+
+    border: 1px solid #666;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+    padding: 30px;
+
+    width: 500px;
+    height: 300px;
+    background-color: white;
+}
+
+.title-modal {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title-modal h2 {
+    margin: 0;
+}

@@ -81,6 +81,15 @@ function validateMinimumAge(age, minimumAge = 18) {
 }
 
 
+function validateEmail(email) {
+    const errors = [];
+    if (!email.includes("@")) {
+        errors.push("L'adresse email doit contenir un @");
+    }
+    return errors;
+}
+
+
 function validateNom(nom) {
     const errors = [];
 
