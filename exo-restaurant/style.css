@@ -1,0 +1,416 @@
+/* Import des polices Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
+
+/* Reset et styles de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #333;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Container principal */
+#carte {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fefefe;
+    padding: 50px 60px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+/* Header */
+#header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid #d4af37;
+}
+
+#header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3em;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+#header h1 i {
+    color: #d4af37;
+    font-size: 0.6em;
+}
+
+.subtitle {
+    font-size: 1.2em;
+    color: #666;
+    font-weight: 300;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+.ornament {
+    color: #d4af37;
+    font-size: 1.5em;
+    letter-spacing: 15px;
+}
+
+/* Sections du menu */
+.menu-section {
+    margin-bottom: 50px;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2em;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 2px;
+    background: #d4af37;
+}
+
+/* Sous-sections pour les plats */
+.plats-subsection {
+    margin-bottom: 40px;
+}
+
+.plats-subsection:last-child {
+    margin-bottom: 0;
+}
+
+.subsection-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5em;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    padding-left: 20px;
+    border-left: 4px solid #d4af37;
+}
+
+/* Items du menu */
+.menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.menu-item {
+    padding: 20px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+    background: #f9f9f9;
+    border-left-color: #d4af37;
+    transform: translateX(5px);
+}
+
+.menu-item.highlight {
+    background: linear-gradient(to right, #fff9e6 0%, #ffffff 100%);
+    border-left-color: #d4af37;
+}
+
+.menu-item.vegetarian {
+    border-left-color: #52a552;
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    gap: 15px;
+}
+
+.item-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3em;
+    color: #1a1a1a;
+    font-weight: 600;
+    flex: 1;
+}
+
+.item-header h3 i {
+    font-size: 0.7em;
+    color: #d4af37;
+    margin-left: 5px;
+}
+
+.menu-item.vegetarian .item-header h3 i {
+    color: #52a552;
+}
+
+.price {
+    font-family: 'Lato', sans-serif;
+    font-size: 1.2em;
+    color: #d4af37;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.description {
+    font-size: 0.95em;
+    color: #666;
+    line-height: 1.6;
+    font-style: italic;
+    margin-left: 0;
+}
+
+/* Section Desserts */
+.desserts-section {
+    margin-bottom: 50px;
+}
+
+.desserts-content {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.desserts-list {
+    flex: 1;
+}
+
+.desserts-image {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+.desserts-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.desserts-image img:hover {
+    transform: scale(1.05);
+}
+
+/* Liste simple pour les desserts */
+.simple-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.simple-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px dotted #d4af37;
+    transition: all 0.3s ease;
+}
+
+.simple-list li:hover {
+    background: #f9f9f9;
+    padding-left: 25px;
+}
+
+.simple-list li:last-child {
+    border-bottom: none;
+}
+
+.item-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2em;
+    color: #1a1a1a;
+    font-weight: 500;
+}
+
+.item-price {
+    font-family: 'Lato', sans-serif;
+    font-size: 1.1em;
+    color: #d4af37;
+    font-weight: 700;
+}
+
+/* Section Boissons */
+.beverages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.beverage-category h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5em;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.menu-item.small {
+    padding: 12px 15px;
+}
+
+.menu-item.small .item-header {
+    margin-bottom: 0;
+}
+
+.menu-item.small .item-header span:first-child {
+    font-size: 1.05em;
+    color: #333;
+}
+
+/* Footer */
+#footer {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 2px solid #d4af37;
+    text-align: center;
+}
+
+#footer .ornament {
+    margin-bottom: 20px;
+}
+
+.footer-text {
+    font-size: 0.9em;
+    color: #666;
+    margin: 8px 0;
+    font-style: italic;
+}
+
+.footer-text i {
+    color: #52a552;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #carte {
+        padding: 30px 25px;
+    }
+
+    #header h1 {
+        font-size: 2em;
+    }
+
+    .subtitle {
+        font-size: 1em;
+        letter-spacing: 2px;
+    }
+
+    .section-title {
+        font-size: 1.6em;
+    }
+
+    .subsection-title {
+        font-size: 1.3em;
+    }
+
+    .item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .item-header h3 {
+        font-size: 1.1em;
+    }
+
+    .price {
+        font-size: 1.1em;
+    }
+
+    .desserts-content {
+        flex-direction: column;
+    }
+
+    .desserts-image {
+        width: 100%;
+    }
+
+    .desserts-image img {
+        height: 300px;
+    }
+
+    .beverages-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    #carte {
+        padding: 20px 15px;
+    }
+
+    #header h1 {
+        font-size: 1.6em;
+        letter-spacing: 1px;
+    }
+
+    .menu-item {
+        padding: 15px;
+    }
+
+    .ornament {
+        letter-spacing: 10px;
+    }
+}
+
+/* Animation d'entrée */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-section {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Style d'impression */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+
+    #carte {
+        box-shadow: none;
+        padding: 20px;
+    }
+
+    .menu-item:hover {
+        background: none;
+        transform: none;
+    }
+}
