@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     $bouton2.addEventListener('click', event => {
-        console.log('Bouton2 cliqué capture');
+        console.log('Bouton2 cliqué bubble');
         // event.stopPropagation();
     }, false);
 
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $troisiemeLevel.addEventListener('click', event => {
         console.log('TroisiemeLevel cliqué bubble');
-        // event.stopPropagation();
+        event.stopPropagation();
     }, false);
 
     $deuxiemeLevel.addEventListener('click', event => {
