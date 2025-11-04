@@ -13,84 +13,39 @@ const $listePlats = document.querySelector("#Plats .plats-subsection.plats .menu
 // FONCTIONS D'AJOUT D'ÉLÉMENTS AU DOM
 // ============================================
 
-/**
- * Ajoute un dessert à la liste des desserts
- * @param {string} name - Nom du dessert
- * @param {number} price - Prix du dessert
- */
-const addDessert = (name, price) => {
-    const $li = document.createElement("li");
-    $li.innerHTML = `
-        <span class="item-name">${name}</span>
-        <span class="item-price">${price}€</span>
-    `;
-    $listeDesserts.appendChild($li);
-};
 
-/**
- * Ajoute une boisson à la liste des boissons
- * @param {string} name - Nom de la boisson
- * @param {number} price - Prix de la boisson
- */
-const addBoisson = (name, price) => {
-    const $li = document.createElement("li");
-    $li.innerHTML = `
-        <span class="item-name">${name}</span>
-        <span class="item-price">${price}€</span>
-    `;
-    $listeBoissons.appendChild($li);
-};
+const createLine = (name, price, options = {}) => {
+    const {description, highlight, vegetarian} = options;
+    // test de validation input
+    if (!name || !price) {
+        throw new Error("Les arguments 'name' et 'price' sont obligatoires");
+    }
 
-/**
- * Ajoute une entrée à la liste des entrées
- * @param {string} name - Nom de l'entrée
- * @param {number} price - Prix de l'entrée
- * @param {string} description - Description de l'entrée
- */
-const addEntree = (name, price, description) => {
-    const div = document.createElement("div");
-    div.className = "menu-item";
-    div.innerHTML = `
-        <div class="item-header">
-            <h3>${name}</h3>
-            <span class="price">${price}€</span>
-        </div>
-        <p class="description">${description}</p>
-    `;
-    $listeEntrees.appendChild(div);
-};
-
-/**
- * Ajoute un plat de résistance à la liste des plats
- * @param {string} name - Nom du plat
- * @param {number} price - Prix du plat
- * @param {string} description - Description du plat
- * @param {Object} options - Options du plat (highlight, vegetarian)
- */
-const addPlat = (name, price, description, options = {}) => {
-    const div = document.createElement("div");
-    div.className = "menu-item";
+    const $div = document.createElement("div");
+    $div.className = "menu-item";
 
     // Ajout des classes spéciales selon les options
-    if (options.highlight) {
-        div.classList.add("highlight");
+    if (highlight) {
+        $div.classList.add("highlight");
     }
-    if (options.vegetarian) {
-        div.classList.add("vegetarian");
+    if (vegetarian) {
+        $div.classList.add("vegetarian");
     }
 
     // Ajout des icônes selon le type de plat
-    const icon = options.highlight ? ' <i class="bi bi-star-fill"></i>' :
-        options.vegetarian ? ' <i class="bi bi-leaf"></i>' : '';
+    const icon = highlight ? ' <i class="bi bi-star-fill"></i>' :
+        vegetarian ? ' <i class="bi bi-leaf"></i>' : '';
 
-    div.innerHTML = `
+    $div.innerHTML = `
         <div class="item-header">
             <h3>${name}${icon}</h3>
             <span class="price">${price}€</span>
         </div>
-        <p class="description">${description}</p>
+        ${description ? `<p class="description">${description}</p>` : ''}
     `;
-    $listePlats.appendChild(div);
+
+
+    return $div;
 };
 
 
@@ -98,48 +53,16 @@ const addPlat = (name, price, description, options = {}) => {
 // FONCTIONS DE MISE À JOUR DU DOM
 // ============================================
 
-/**
- * Met à jour la liste des boissons dans le DOM
- * @param {Array} data - Tableau d'objets boisson {name, price}
- */
-const updateDomBoissons = (data) => {
+const updateDom = (data, $container) => {
     data.forEach(item => {
-        addBoisson(item.name, item.price);
-    });
-}
-
-/**
- * Met à jour la liste des desserts dans le DOM
- * @param {Array} data - Tableau d'objets dessert {name, price}
- */
-const updateDomDesserts = (data) => {
-    data.forEach(item => {
-        addDessert(item.name, item.price);
-    });
-}
-
-/**
- * Met à jour la liste des plats de résistance dans le DOM
- * @param {Array} data - Tableau d'objets plat {name, price, description, highlight?, vegetarian?}
- */
-const updateDomPlats = (data) => {
-    data.forEach(item => {
-        addPlat(item.name, item.price, item.description, {
+        const $div = createLine(item.name, item.price, {
+            description: item.description,
             highlight: item.highlight,
             vegetarian: item.vegetarian
         });
+        $container.appendChild($div);
     });
-};
-
-/**
- * Met à jour la liste des entrées dans le DOM
- * @param {Array} data - Tableau d'objets entrée {name, price, description}
- */
-const updateDomEntrees = (data) => {
-    data.forEach(item => {
-        addEntree(item.name, item.price, item.description);
-    });
-};
+};  
 
 
 // ============================================
@@ -154,16 +77,16 @@ const updateDomEntrees = (data) => {
 const updateCarte = async () => {
     // Chargement parallèle des entrées et plats de résistance
     const [dataE, dataP] = await Promise.all([fetchEntrees(), fetchPlats()]);
-    updateDomPlats(dataP);
-    updateDomEntrees(dataE);
+    updateDom(dataP, $listePlats);
+    updateDom(dataE, $listeEntrees);
 
     // Chargement et affichage des desserts
     const dataD = await fetchDataDesserts();
-    updateDomDesserts(dataD);
+    updateDom(dataD, $listeDesserts);
 
     // Chargement et affichage des boissons
     const dataB = await fetchDataBoissons();
-    updateDomBoissons(dataB);
+    updateDom(dataB, $listeBoissons);
 };
 
 
