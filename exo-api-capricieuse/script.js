@@ -35,8 +35,9 @@ const appelAvecRetry = async (maxTentatives) => {
 
 (async () => {
     try {
-        await appelAvecRetry(3);
+        const data = await appelAvecRetry(3);
         console.log("✅ Succès full !");
+        console.log(data);
     } catch (erreur) {
         console.log(erreur.message);
     }
