@@ -1,3 +1,4 @@
+
 // Script de simulation d'une API capricieuse avec système de retry
 
 /**
