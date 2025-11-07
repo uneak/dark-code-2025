@@ -72,7 +72,7 @@ const api5 = async () => {
 };
 
 
-Promise.all([api1(), api2(), api3(), api4(), api5()]).then(results => {
+Promise.allSettled([api1(), api2(), api3(), api4(), api5()]).then(results => {
     console.log("📊 Rapport de chargement :");
     console.log("✅", results.filter((result) => result.status === "fulfilled").length, "réussites");
     console.log("❌", results.filter((result) => result.status === "rejected").length, "échecs");
