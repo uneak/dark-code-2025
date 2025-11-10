@@ -1,14 +1,28 @@
 
 
+const entreprise = {
+  nom: 'TechCorp',
+  adresse: {
+    rue: '123 Main St',
+    ville: 'Paris',
+    cp: 75001
+  },
+  employes: [
+    { nom: 'Alice', poste: 'Dev' },
+    { nom: 'Bob', poste: 'Designer' }
+  ]
+};
 
-// Exemple pratique : traitement de données
-const produits = [
-  { nom: 'Laptop', prix: 1000, categorie: 'électronique', stock: 5 },
-  { nom: 'Souris', prix: 25, categorie: 'électronique', stock: 50 },
-  { nom: 'Clavier', prix: 75, categorie: 'électronique', stock: 0 },
-  { nom: 'Livre', prix: 15, categorie: 'culture', stock: 20 }
-];
+// Accès
+// console.log(entreprise.adresse.ville); // 'Paris'
+// console.log(entreprise.employes[0].nom); // 'Alice'
+
+// Optional chaining (?.)
+const user = { profile: null };
 
 
-// Prix total des produits électroniques en stock
-// utiliser que les fonctions de traitement de données
+if (user && user.profile) {
+  console.log(user.profile.email); // 'john.doe@example.com'
+} else {
+  console.log('undefined');
+}
