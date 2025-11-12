@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagramme Interactif - Architecture du Jeu Pokémon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: #f5f5f5;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 2px solid #333;
+        }
+
+        .color-init { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .color-display { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+        .color-combat { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+        .color-animation { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+
+        .diagram {
+            position: relative;
+            padding: 40px;
+            background: #f9f9f9;
+            border-radius: 15px;
+            min-height: 800px;
+        }
+
+        .function-group {
+            margin-bottom: 40px;
+        }
+
+        .group-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .functions-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .function-box {
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 3px solid;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 200px;
+        }
+
+        .function-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .function-box.active {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            border-color: #ffd700;
+        }
+
+        .function-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .function-desc {
+            font-size: 0.85em;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .init-box {
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-color: #667eea;
+        }
+
+        .display-box {
+            background: linear-gradient(135deg, #2ecc7120 0%, #27ae6020 100%);
+            border-color: #2ecc71;
+        }
+
+        .combat-box {
+            background: linear-gradient(135deg, #f39c1220 0%, #e67e2220 100%);
+            border-color: #f39c12;
+        }
+
+        .animation-box {
+            background: linear-gradient(135deg, #e74c3c20 0%, #c0392b20 100%);
+            border-color: #e74c3c;
+        }
+
+        .info-panel {
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            min-height: 200px;
+        }
+
+        .info-panel h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .info-panel .default-text {
+            color: #666;
+            font-style: italic;
+        }
+
+        .info-content {
+            display: none;
+        }
+
+        .info-content.active {
+            display: block;
+        }
+
+        .calls-list {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+
+        .calls-list li {
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .flow-diagram {
+            margin-top: 40px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            border: 2px solid #ddd;
+        }
+
+        .flow-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .flow-step {
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 5px solid;
+            background: #f9f9f9;
+            position: relative;
+        }
+
+        .flow-step::after {
+            content: '↓';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            color: #999;
+        }
+
+        .flow-step:last-child::after {
+            content: '';
+        }
+
+        .step-init { border-left-color: #667eea; }
+        .step-display { border-left-color: #2ecc71; }
+        .step-combat { border-left-color: #f39c12; }
+        .step-animation { border-left-color: #e74c3c; }
+
+        @media (max-width: 768px) {
+            .legend {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .functions-container {
+                flex-direction: column;
+            }
+
+            .function-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Architecture du Jeu Pokémon</h1>
+        <p class="subtitle">Diagramme interactif des fonctions et leurs interactions</p>
+
+        <!-- Légende -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color color-init"></div>
+                <span>Initialisation</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-display"></div>
+                <span>Affichage</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-combat"></div>
+                <span>Combat</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color color-animation"></div>
+                <span>Animation</span>
+            </div>
+        </div>
+
+        <!-- Diagramme des fonctions -->
+        <div class="diagram">
+            <!-- Groupe 1: Initialisation -->
+            <div class="function-group">
+                <div class="group-title">
+                    🔵 Groupe 1: INITIALISATION ET CHARGEMENT
+                </div>
+                <div class="functions-container">
+                    <div class="function-box init-box" data-function="initGame">
+                        <div class="function-name">initGame()</div>
+                        <div class="function-desc">Point d'entrée principal du jeu</div>
+                    </div>
+                    <div class="function-box init-box" data-function="loadRandomPokemon">
+                        <div class="function-name">loadRandomPokemon()</div>
+                        <div class="function-desc">Charge un Pokémon depuis l'API</div>
+                    </div>
+                    <div class="function-box init-box" data-function="initializePokemon">
+                        <div class="function-name">initializePokemon(apiData)</div>
+                        <div class="function-desc">Initialise un Pokémon avec ses stats</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groupe 2: Affichage -->
+            <div class="function-group">
+                <div class="group-title">
+                    🟢 Groupe 2: AFFICHAGE ET INTERFACE
+                </div>
+                <div class="functions-container">
+                    <div class="function-box display-box" data-function="displayPokemon">
+                        <div class="function-name">displayPokemon(num, pokemon)</div>
+                        <div class="function-desc">Affiche toutes les infos d'un Pokémon</div>
+                    </div>
+                    <div class="function-box display-box" data-function="updateBars">
+                        <div class="function-name">updateBars(num)</div>
+                        <div class="function-desc">Met à jour les barres HP/Mana</div>
+                    </div>
+                    <div class="function-box display-box" data-function="updateTurnIndicator">
+                        <div class="function-name">updateTurnIndicator()</div>
+                        <div class="function-desc">Montre quel Pokémon joue</div>
+                    </div>
+                    <div class="function-box display-box" data-function="addLog">
+                        <div class="function-name">addLog(message, type)</div>
+                        <div class="function-desc">Ajoute un message au log</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groupe 3: Combat -->
+            <div class="function-group">
+                <div class="group-title">
+                    🟡 Groupe 3: LOGIQUE DE COMBAT
+                </div>
+                <div class="functions-container">
+                    <div class="function-box combat-box" data-function="basicAttack">
+                        <div class="function-name">basicAttack()</div>
+                        <div class="function-desc">Attaque simple (dégâts + mana)</div>
+                    </div>
+                    <div class="function-box combat-box" data-function="magicAttack">
+                        <div class="function-name">magicAttack()</div>
+                        <div class="function-desc">Attaque magique (gros dégâts)</div>
+                    </div>
+                    <div class="function-box combat-box" data-function="nextTurn">
+                        <div class="function-name">nextTurn()</div>
+                        <div class="function-desc">Passe au tour suivant</div>
+                    </div>
+                    <div class="function-box combat-box" data-function="checkVictory">
+                        <div class="function-name">checkVictory()</div>
+                        <div class="function-desc">Vérifie si un Pokémon a gagné</div>
+                    </div>
+                    <div class="function-box combat-box" data-function="endGame">
+                        <div class="function-name">endGame(winner)</div>
+                        <div class="function-desc">Termine la partie</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groupe 4: Animations -->
+            <div class="function-group">
+                <div class="group-title">
+                    🔴 Groupe 4: ANIMATIONS
+                </div>
+                <div class="functions-container">
+                    <div class="function-box animation-box" data-function="animateAttack">
+                        <div class="function-name">animateAttack(num)</div>
+                        <div class="function-desc">Animation d'attaque (shake)</div>
+                    </div>
+                    <div class="function-box animation-box" data-function="animateDamage">
+                        <div class="function-name">animateDamage(num)</div>
+                        <div class="function-desc">Animation de dégâts (flash)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panneau d'information -->
+        <div class="info-panel">
+            <h2>📋 Détails de la fonction</h2>
+            <p class="default-text">Cliquez sur une fonction pour voir ses détails et interactions</p>
+            
+            <!-- Info pour chaque fonction -->
+            <div id="info-initGame" class="info-content">
+                <h3>initGame()</h3>
+                <p><strong>Rôle :</strong> Point d'entrée principal qui orchestre le démarrage du jeu</p>
+                <p><strong>Appelle les fonctions :</strong></p>
+                <ul class="calls-list">
+                    <li>→ loadRandomPokemon() (×2 fois)</li>
+                    <li>→ initializePokemon() (×2 fois)</li>
+                    <li>→ displayPokemon() (×2 fois)</li>
+                    <li>→ updateTurnIndicator()</li>
+                    <li>→ addLog()</li>
+                </ul>
+                <div class="code-block">async function initGame() {
+    // Charger 2 Pokémon
+    const [poke1, poke2] = await Promise.all([
+        loadRandomPokemon(),
+        loadRandomPokemon()
+    ]);
+    
+    // Initialiser
+    gameState.pokemon1 = initializePokemon(poke1);
+    gameState.pokemon2 = initializePokemon(poke2);
+    
+    // Afficher
+    displayPokemon(1, gameState.pokemon1);
+    displayPokemon(2, gameState.pokemon2);
+    
+    updateTurnIndicator();
+    addLog("Le combat commence !");
+}</div>
+            </div>
+
+            <div id="info-loadRandomPokemon" class="info-content">
+                <h3>loadRandomPokemon()</h3>
+                <p><strong>Rôle :</strong> Charge un Pokémon aléatoire depuis l'API PokéAPI</p>
+                <p><strong>Retourne :</strong> Objet avec les données brutes de l'API</p>
+                <p><strong>Appelle :</strong> Aucune fonction (fonction feuille)</p>
+                <div class="code-block">async function loadRandomPokemon() {
+    const randomId = Math.floor(Math.random() * 151) + 1;
+    const response = await fetch(
+        `https://pokeapi.co/api/v2/pokemon/${randomId}`
+    );
+    const data = await response.json();
+    return data;
+}</div>
+            </div>
+
+            <div id="info-initializePokemon" class="info-content">
+                <h3>initializePokemon(apiData)</h3>
+                <p><strong>Rôle :</strong> Transforme les données API en objet Pokémon utilisable</p>
+                <p><strong>Paramètres :</strong> apiData (données brutes de l'API)</p>
+                <p><strong>Retourne :</strong> Objet Pokémon avec stats de combat</p>
+                <p><strong>Appelle :</strong> Aucune fonction (fonction feuille)</p>
+                <div class="code-block">function initializePokemon(apiData) {
+    const hp = apiData.stats.find(s => s.stat.name === 'hp').base_stat;
+    const attack = apiData.stats.find(s => s.stat.name === 'attack').base_stat;
+    
+    return {
+        name: apiData.name,
+        sprite: apiData.sprites.front_default,
+        maxHp: CONFIG.MAX_HP,
+        currentHp: CONFIG.MAX_HP,
+        currentMana: CONFIG.INITIAL_MANA,
+        attack: attack,
+        // ... etc
+    };
+}</div>
+            </div>
+
+            <div id="info-displayPokemon" class="info-content">
+                <h3>displayPokemon(pokemonNumber, pokemon)</h3>
+                <p><strong>Rôle :</strong> Affiche toutes les informations d'un Pokémon dans sa carte</p>
+                <p><strong>Paramètres :</strong> pokemonNumber (1 ou 2), pokemon (objet)</p>
+                <p><strong>Appelle :</strong></p>
+                <ul class="calls-list">
+                    <li>→ updateBars()</li>
+                </ul>
+                <div class="code-block">function displayPokemon(pokemonNumber, pokemon) {
+    document.getElementById(`pokemon${pokemonNumber}-name`)
+        .textContent = pokemon.name;
+    
+    document.getElementById(`pokemon${pokemonNumber}-image`)
+        .src = pokemon.sprite;
+    
+    // Afficher les stats
+    document.getElementById(`pokemon${pokemonNumber}-attack`)
+        .textContent = pokemon.attack;
+    
+    updateBars(pokemonNumber);
+}</div>
+            </div>
+
+            <div id="info-updateBars" class="info-content">
+                <h3>updateBars(pokemonNumber)</h3>
+                <p><strong>Rôle :</strong> Met à jour les barres de vie et mana avec les valeurs actuelles</p>
+                <p><strong>Paramètres :</strong> pokemonNumber (1 ou 2)</p>
+                <p><strong>Appelle :</strong> Aucune fonction (fonction feuille)</p>
+                <div class="code-block">function updateBars(pokemonNumber) {
+    const pokemon = gameState[`pokemon${pokemonNumber}`];
+    
+    // Calculer les pourcentages
+    const hpPercent = (pokemon.currentHp / pokemon.maxHp) * 100;
+    
+    // Mettre à jour la barre
+    const hpBar = document.getElementById(`pokemon${pokemonNumber}-hp-bar`);
+    hpBar.style.width = `${hpPercent}%`;
+    
+    // Changer la couleur
+    if (hpPercent > 50) hpBar.classList.add('high');
+    else if (hpPercent > 25) hpBar.classList.add('medium');
+    else hpBar.classList.add('low');
+}</div>
+            </div>
+
+            <div id="info-updateTurnIndicator" class="info-content">
+                <h3>updateTurnIndicator()</h3>
+                <p><strong>Rôle :</strong> Met à jour l'affichage pour montrer quel Pokémon joue</p>
+                <p><strong>Appelle :</strong> Aucune fonction (fonction feuille)</p>
+                <div class="code-block">function updateTurnIndicator() {
+    const pokemon = gameState[`pokemon${gameState.currentTurn}`];
+    
+    document.getElementById('turn-indicator').textContent = 
+        `Tour de ${pokemon.name.toUpperCase()}`;
+    
+    // Bordure dorée sur la carte active
+    document.getElementById('pokemon1-card')
+        .classList.remove('active-turn');
+    document.getElementById('pokemon2-card')
+        .classList.remove('active-turn');
+    document.getElementById(`pokemon${gameState.currentTurn}-card`)
+        .classList.add('active-turn');
+}</div>
+            </div>
+
+            <div id="info-addLog" class="info-content">
+                <h3>addLog(message, type)</h3>
+                <p><strong>Rôle :</strong> Ajoute un message au log de combat</p>
+                <p><strong>Paramètres :</strong> message (texte), type ('attack', 'heal', 'victory')</p>
+                <p><strong>Appelle :</strong> Aucune fonction (fonction feuille)</p>
+                <div class="code-block">function addLog(message, type = 'attack') {
+    const logContainer = document.getElementById('log-container');
+    
+    const logEntry = document.createElement('div');
+    logEntry.className = `log-entry ${type}`;
+    logEntry.textContent = message;
+    
+    logContainer.insertBefore(logEntry, logContainer.firstChild);
+    
+    // Limiter à 10 messages
+    while (logContainer.children.length > 10) {
+        logContainer.removeChild(logContainer.lastChild);
+    }
+}</div>
+            </div>
+
+            <div id="info-basicAttack" class="info-content">
+                <h3>basicAttack()</h3>
+                <p><strong>Rôle :</strong> Exécute une attaque simple (dégâts + recharge mana)</p>
+                <p><strong>Appelle :</strong></p>
+                <ul class="calls-list">
+                    <li>→ animateAttack()</li>
+                    <li>→ animateDamage()</li>
+                    <li>→ updateBars() (×2 fois)</li>
+                    <li>→ addLog()</li>
+                    <li>→ checkVictory()</li>
+                    <li>→ nextTurn()</li>
+                </ul>
+                <div class="code-block">function basicAttack() {
+    const attacker = gameState[`pokemon${gameState.currentTurn}`];
+    const defenderNum = gameState.currentTurn === 1 ? 2 : 1;
+    const defender = gameState[`pokemon${defenderNum}`];
+    
+    animateAttack(gameState.currentTurn);
+    
+    // Appliquer dégâts
+    defender.currentHp -= CONFIG.BASIC_ATTACK_DAMAGE;
+    
+    // Recharger mana
+    attacker.currentMana += CONFIG.BASIC_MANA_GAIN;
+    
+    animateDamage(defenderNum);
+    updateBars(gameState.currentTurn);
+    updateBars(defenderNum);
+    addLog(`${attacker.name} attaque !`, 'attack');
+    
+    if (checkVictory()) return;
+    nextTurn();
+}</div>
+            </div>
+
+            <div id="info-magicAttack" class="info-content">
+                <h3>magicAttack()</h3>
+                <p><strong>Rôle :</strong> Exécute une attaque magique (gros dégâts - coût mana)</p>
+                <p><strong>Appelle :</strong></p>
+                <ul class="calls-list">
+                    <li>→ animateAttack()</li>
+                    <li>→ animateDamage()</li>
+                    <li>→ updateBars() (×2 fois)</li>
+                    <li>→ addLog()</li>
+                    <li>→ checkVictory()</li>
+                    <li>→ nextTurn()</li>
+                </ul>
+                <div class="code-block">function magicAttack() {
+    const attacker = gameState[`pokemon${gameState.currentTurn}`];
+    
+    // Vérifier le mana
+    if (attacker.currentMana < CONFIG.MAGIC_MANA_COST) {
+        addLog("Pas assez de mana !", 'attack');
+        return;
+    }
+    
+    const defenderNum = gameState.currentTurn === 1 ? 2 : 1;
+    const defender = gameState[`pokemon${defenderNum}`];
+    
+    animateAttack(gameState.currentTurn);
+    
+    // Consommer mana et infliger dégâts
+    attacker.currentMana -= CONFIG.MAGIC_MANA_COST;
+    defender.currentHp -= CONFIG.MAGIC_ATTACK_DAMAGE;
+    
+    animateDamage(defenderNum);
+    updateBars(gameState.currentTurn);
+    updateBars(defenderNum);
+    addLog(`${attacker.name} attaque magique !`, 'attack');
+    
+    if (checkVictory()) return;
+    nextTurn();
+}</div>
+            </div>
+
+            <div id="info-nextTurn" class="info-content">
+                <h3>nextTurn()</h3>
+                <p><strong>Rôle :</strong> Passe au tour du Pokémon suivant</p>
+                <p><strong>Appelle :</strong></p>
+                <ul class="calls-list">
+                    <li>→ updateTurnIndicator()</li>
+                </ul>
+                <div class="code-block">function nextTurn() {
+    gameState.currentTurn = gameState.currentTurn === 1 ? 2 : 1;
+    updateTurnIndicator();
+}</div>
+            </div>
+
+            <div id="info-checkVictory" class="info-content">
+                <h3>checkVictory()</h3>
+                <p><strong>Rôle :</strong> Vérifie si un Pokémon a gagné</p>
+                <p><strong>Retourne :</strong> Boolean (true si partie terminée)</p>
+                <p><strong>Appelle :</strong></p>
+                <ul class="calls-list">
+                    <li>→ endGame()</li>
+                </ul>
+                <div class="code-block">function checkVictory() {
+    if (gameState.pokemon1.currentHp <= 0) {
+        endGame(2);
+        return true;
+    }
+    if (gameState.pokemon2.currentHp <= 0) {
+        endGame(1);
+        return true;
+    }
+    return false;
+}</div>
+            </div>
+
+            <div id="info-endGame" class="info-content">
+                <h3>endGame(winner)</h3>
+                <p><strong>Rôle :</strong> Termine la partie et affiche le vainqueur</p>
+                <p><strong>Paramètres :</strong> winner (numéro du Pokémon gagnant 1 ou 2)</p>
+                <p><strong>Appelle :</strong></p>
+                <ul class="calls-list">
+                    <li>→ addLog()</li>
+                </ul>
+                <div class="code-block">function endGame(winner) {
+    gameState.gameOver = true;
+    const winnerPokemon = gameState[`pokemon${winner}`];
+    
+    // Désactiver les boutons
+    document.getElementById('btn-basic-attack').disabled = true;
+    document.getElementById('btn-magic-attack').disabled = true;
+    
+    addLog(`${winnerPokemon.name} GAGNE !`, 'victory');
+    
+    // Afficher la modal de victoire
+    document.getElementById('victory-modal').classList.add('active');
+}</div>
+            </div>
+
+            <div id="info-animateAttack" class="info-content">
+                <h3>animateAttack(pokemonNumber)</h3>
+                <p><strong>Rôle :</strong> Joue l'animation d'attaque (shake)</p>
+                <p><strong>Paramètres :</strong> pokemonNumber (1 ou 2)</p>
+                <p><strong>Appelle :</strong> Aucune fonction (fonction feuille)</p>
+                <div class="code-block">function animateAttack(pokemonNumber) {
+    const card = document.getElementById(`pokemon${pokemonNumber}-card`);
+    card.classList.add('attacking');
+    
+    setTimeout(() => {
+        card.classList.remove('attacking');
+    }, 500);
+}</div>
+            </div>
+
+            <div id="info-animateDamage" class="info-content">
+                <h3>animateDamage(pokemonNumber)</h3>
+                <p><strong>Rôle :</strong> Joue l'animation de dégâts (flash rouge)</p>
+                <p><strong>Paramètres :</strong> pokemonNumber (1 ou 2)</p>
+                <p><strong>Appelle :</strong> Aucune fonction (fonction feuille)</p>
+                <div class="code-block">function animateDamage(pokemonNumber) {
+    const card = document.getElementById(`pokemon${pokemonNumber}-card`);
+    card.classList.add('damaged');
+    
+    setTimeout(() => {
+        card.classList.remove('damaged');
+    }, 500);
+}</div>
+            </div>
+        </div>
+
+        <!-- Diagramme de flux -->
+        <div class="flow-diagram">
+            <div class="flow-title">🔄 Flux d'exécution lors d'une attaque</div>
+            <div class="flow-steps">
+                <div class="flow-step step-combat">
+                    <strong>1. Clic bouton</strong><br>
+                    basicAttack() ou magicAttack()
+                </div>
+                <div class="flow-step step-animation">
+                    <strong>2. Animation attaquant</strong><br>
+                    animateAttack(attacker)
+                </div>
+                <div class="flow-step step-combat">
+                    <strong>3. Calcul des dégâts</strong><br>
+                    Modification HP/Mana dans gameState
+                </div>
+                <div class="flow-step step-animation">
+                    <strong>4. Animation défenseur</strong><br>
+                    animateDamage(defender)
+                </div>
+                <div class="flow-step step-display">
+                    <strong>5. Mise à jour affichage</strong><br>
+                    updateBars(attacker)<br>
+                    updateBars(defender)
+                </div>
+                <div class="flow-step step-display">
+                    <strong>6. Log de combat</strong><br>
+                    addLog(message)
+                </div>
+                <div class="flow-step step-combat">
+                    <strong>7. Vérification victoire</strong><br>
+                    checkVictory() → endGame() si victoire
+                </div>
+                <div class="flow-step step-combat">
+                    <strong>8. Tour suivant</strong><br>
+                    nextTurn() → updateTurnIndicator()
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion de l'interactivité
+        const functionBoxes = document.querySelectorAll('.function-box');
+        const infoContents = document.querySelectorAll('.info-content');
+        const defaultText = document.querySelector('.default-text');
+
+        functionBoxes.forEach(box => {
+            box.addEventListener('click', () => {
+                const functionName = box.getAttribute('data-function');
+                
+                // Retirer toutes les classes actives
+                functionBoxes.forEach(b => b.classList.remove('active'));
+                infoContents.forEach(content => content.classList.remove('active'));
+                
+                // Cacher le texte par défaut
+                if (defaultText) {
+                    defaultText.style.display = 'none';
+                }
+                
+                // Activer la box cliquée
+                box.classList.add('active');
+                
+                // Afficher l'info correspondante
+                const infoElement = document.getElementById('info-' + functionName);
+                if (infoElement) {
+                    infoElement.classList.add('active');
+                }
+
+                // Scroll vers le panneau d'info
+                document.querySelector('.info-panel').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

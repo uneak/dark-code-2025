@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combat Pokémon - Jeu Tour par Tour</title>
+    <style>
+        /* ========================================
+           STYLES GÉNÉRAUX
+        ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ========================================
+           ÉCRAN DE CHARGEMENT
+        ======================================== */
+        #loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ========================================
+           ARÈNE DE COMBAT
+        ======================================== */
+        .battle-arena {
+            display: none;
+        }
+
+        .battle-arena.active {
+            display: block;
+        }
+
+        .battlefield {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        /* ========================================
+           CARTES POKÉMON
+        ======================================== */
+        .pokemon-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            width: 45%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .pokemon-card.active-turn {
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .pokemon-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .pokemon-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            text-transform: capitalize;
+            margin-bottom: 5px;
+        }
+
+        .pokemon-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        /* ========================================
+           BARRES DE VIE ET MANA
+        ======================================== */
+        .stats-container {
+            margin-top: 15px;
+        }
+
+        .stat-row {
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+        }
+
+        .stat-bar {
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            transition: width 0.5s ease, background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .hp-bar {
+            background: linear-gradient(90deg, #ff4757 0%, #ff6348 100%);
+        }
+
+        .hp-bar.high {
+            background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        .hp-bar.medium {
+            background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        .hp-bar.low {
+            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .mana-bar {
+            background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+        }
+
+        /* ========================================
+           ANIMATIONS D'ATTAQUE
+        ======================================== */
+        @keyframes attack-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes damage-flash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(255, 0, 0, 0.3); }
+        }
+
+        @keyframes heal-flash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(0, 255, 0, 0.3); }
+        }
+
+        .pokemon-card.attacking {
+            animation: attack-shake 0.5s ease;
+        }
+
+        .pokemon-card.damaged {
+            animation: damage-flash 0.5s ease;
+        }
+
+        .pokemon-card.healing {
+            animation: heal-flash 0.5s ease;
+        }
+
+        /* ========================================
+           PANEL DE STATISTIQUES
+        ======================================== */
+        .pokemon-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .pokemon-stats span {
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        /* ========================================
+           CONTRÔLES DE COMBAT
+        ======================================== */
+        .battle-controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .turn-indicator {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-basic {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        .btn-magic {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            margin-top: 20px;
+        }
+
+        /* ========================================
+           LOG DE COMBAT
+        ======================================== */
+        .battle-log {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .battle-log h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .log-entry {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .log-entry.attack {
+            background: #ffe5e5;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .log-entry.heal {
+            background: #e5f5ff;
+            border-left: 4px solid #3498db;
+        }
+
+        .log-entry.victory {
+            background: #fff3cd;
+            border-left: 4px solid #ffd700;
+            font-weight: bold;
+        }
+
+        /* ========================================
+           MODAL DE VICTOIRE
+        ======================================== */
+        .victory-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .victory-modal.active {
+            display: flex;
+        }
+
+        .victory-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalPop 0.5s ease;
+        }
+
+        @keyframes modalPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .victory-content h2 {
+            font-size: 2.5em;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .victory-content p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* ========================================
+           RESPONSIVE
+        ======================================== */
+        @media (max-width: 768px) {
+            .battlefield {
+                flex-direction: column;
+            }
+
+            .pokemon-card {
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>⚔️ Combat Pokémon ⚔️</h1>
+
+        <!-- Écran de chargement -->
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Chargement des Pokémon depuis l'API...</p>
+        </div>
+
+        <!-- Arène de combat -->
+        <div id="battle-arena" class="battle-arena">
+            <!-- Indicateur de tour -->
+            <div class="battle-controls">
+                <div id="turn-indicator" class="turn-indicator"></div>
+                
+                <!-- Boutons d'action -->
+                <div class="action-buttons">
+                    <button id="btn-basic-attack" class="btn-basic">
+                        ⚔️ Attaque Simple
+                    </button>
+                    <button id="btn-magic-attack" class="btn-magic">
+                        ✨ Attaque Magique
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terrain de combat -->
+            <div class="battlefield">
+                <!-- Pokémon 1 -->
+                <div id="pokemon1-card" class="pokemon-card">
+                    <div class="pokemon-header">
+                        <div class="pokemon-name" id="pokemon1-name">Pokémon 1</div>
+                        <img id="pokemon1-image" class="pokemon-image" src="" alt="Pokémon 1">
+                    </div>
+                    
+                    <div class="stats-container">
+                        <!-- Barre de vie -->
+                        <div class="stat-row">
+                            <div class="stat-label">
+                                <span>❤️ PV</span>
+                                <span id="pokemon1-hp-text">100/100</span>
+                            </div>
+                            <div class="stat-bar">
+                                <div id="pokemon1-hp-bar" class="stat-bar-fill hp-bar high" style="width: 100%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Barre de mana -->
+                        <div class="stat-row">
+                            <div class="stat-label">
+                                <span>💧 Mana</span>
+                                <span id="pokemon1-mana-text">50/100</span>
+                            </div>
+                            <div class="stat-bar">
+                                <div id="pokemon1-mana-bar" class="stat-bar-fill mana-bar" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats du Pokémon -->
+                    <div class="pokemon-stats">
+                        <span>⚔️ ATK: <span id="pokemon1-attack">0</span></span>
+                        <span>🛡️ DEF: <span id="pokemon1-defense">0</span></span>
+                    </div>
+                </div>
+
+                <!-- Pokémon 2 -->
+                <div id="pokemon2-card" class="pokemon-card">
+                    <div class="pokemon-header">
+                        <div class="pokemon-name" id="pokemon2-name">Pokémon 2</div>
+                        <img id="pokemon2-image" class="pokemon-image" src="" alt="Pokémon 2">
+                    </div>
+                    
+                    <div class="stats-container">
+                        <!-- Barre de vie -->
+                        <div class="stat-row">
+                            <div class="stat-label">
+                                <span>❤️ PV</span>
+                                <span id="pokemon2-hp-text">100/100</span>
+                            </div>
+                            <div class="stat-bar">
+                                <div id="pokemon2-hp-bar" class="stat-bar-fill hp-bar high" style="width: 100%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Barre de mana -->
+                        <div class="stat-row">
+                            <div class="stat-label">
+                                <span>💧 Mana</span>
+                                <span id="pokemon2-mana-text">50/100</span>
+                            </div>
+                            <div class="stat-bar">
+                                <div id="pokemon2-mana-bar" class="stat-bar-fill mana-bar" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats du Pokémon -->
+                    <div class="pokemon-stats">
+                        <span>⚔️ ATK: <span id="pokemon2-attack">0</span></span>
+                        <span>🛡️ DEF: <span id="pokemon2-defense">0</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log de combat -->
+            <div class="battle-log">
+                <h3>📜 Historique du Combat</h3>
+                <div id="log-container"></div>
+            </div>
+
+            <!-- Bouton nouvelle partie -->
+            <button id="btn-restart" class="btn-restart" style="display: none;">
+                🔄 Nouvelle Partie
+            </button>
+        </div>
+
+        <!-- Modal de victoire -->
+        <div id="victory-modal" class="victory-modal">
+            <div class="victory-content">
+                <h2>🏆 VICTOIRE ! 🏆</h2>
+                <p id="victory-message"></p>
+                <button id="btn-new-game" class="btn-restart">🎮 Nouvelle Partie</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ========================================
+           VARIABLES GLOBALES DU JEU
+        ======================================== */
+        
+        // Objet contenant les données du jeu
+        const gameState = {
+            pokemon1: null,  // Données du premier Pokémon
+            pokemon2: null,  // Données du second Pokémon
+            currentTurn: 1,  // Pokémon dont c'est le tour (1 ou 2)
+            gameOver: false  // État de fin de partie
+        };
+
+        // Configuration du jeu
+        const CONFIG = {
+            MAX_HP: 200,           // Points de vie maximum
+            MAX_MANA: 100,         // Mana maximum
+            INITIAL_MANA: 50,      // Mana de départ
+            BASIC_ATTACK_DAMAGE: 15,   // Dégâts de l'attaque simple
+            MAGIC_ATTACK_DAMAGE: 40,   // Dégâts de l'attaque magique
+            BASIC_MANA_GAIN: 30,       // Mana gagnée par attaque simple
+            MAGIC_MANA_COST: 50        // Coût en mana de l'attaque magique
+        };
+
+        /* ========================================
+           FONCTION PRINCIPALE - INITIALISATION
+        ======================================== */
+        
+        /**
+         * Démarre le jeu en chargeant deux Pokémon aléatoires
+         */
+        async function initGame() {
+            console.log("🎮 Initialisation du jeu...");
+            
+            try {
+                // Afficher l'écran de chargement
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('battle-arena').classList.remove('active');
+
+                // Charger deux Pokémon aléatoires
+                const [poke1, poke2] = await Promise.all([
+                    loadRandomPokemon(),
+                    loadRandomPokemon()
+                ]);
+
+                // Initialiser les Pokémon avec leurs stats
+                gameState.pokemon1 = initializePokemon(poke1);
+                gameState.pokemon2 = initializePokemon(poke2);
+                gameState.currentTurn = 1;
+                gameState.gameOver = false;
+
+                // Afficher les Pokémon à l'écran
+                displayPokemon(1, gameState.pokemon1);
+                displayPokemon(2, gameState.pokemon2);
+
+                // Cacher le chargement et afficher l'arène
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('battle-arena').classList.add('active');
+
+                // Mettre à jour l'indicateur de tour
+                updateTurnIndicator();
+
+                // Ajouter le message de début dans le log
+                addLog("Le combat commence ! Que le meilleur gagne !", "victory");
+                
+                console.log("✅ Jeu initialisé avec succès !");
+                
+            } catch (error) {
+                console.error("❌ Erreur lors de l'initialisation :", error);
+                document.getElementById('loading').innerHTML = 
+                    '<p style="color: red;">❌ Erreur de chargement. Veuillez recharger la page.</p>';
+            }
+        }
+
+        /* ========================================
+           CHARGEMENT DES POKÉMON (API)
+        ======================================== */
+        
+        /**
+         * Charge un Pokémon aléatoire depuis l'API PokéAPI
+         * @returns {Promise<Object>} Les données du Pokémon
+         */
+        async function loadRandomPokemon() {
+            // Générer un ID aléatoire entre 1 et 151 (première génération)
+            const randomId = Math.floor(Math.random() * 151) + 1;
+            
+            console.log(`📡 Chargement du Pokémon #${randomId}...`);
+            
+            // Appel à l'API
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log(`✅ Pokémon chargé : ${data.name}`);
+            
+            return data;
+        }
+
+        /**
+         * Initialise un Pokémon avec ses stats de combat
+         * @param {Object} apiData - Les données brutes de l'API
+         * @returns {Object} Le Pokémon initialisé
+         */
+        function initializePokemon(apiData) {
+            // Extraire les stats depuis les données de l'API
+            const hp = apiData.stats.find(s => s.stat.name === 'hp').base_stat;
+            const attack = apiData.stats.find(s => s.stat.name === 'attack').base_stat;
+            const defense = apiData.stats.find(s => s.stat.name === 'defense').base_stat;
+
+            return {
+                name: apiData.name,
+                sprite: apiData.sprites.front_default,
+                maxHp: CONFIG.MAX_HP,
+                currentHp: CONFIG.MAX_HP,
+                maxMana: CONFIG.MAX_MANA,
+                currentMana: CONFIG.INITIAL_MANA,
+                attack: attack,
+                defense: defense
+            };
+        }
+
+        /* ========================================
+           AFFICHAGE DES POKÉMON
+        ======================================== */
+        
+        /**
+         * Affiche les informations d'un Pokémon sur la carte
+         * @param {number} pokemonNumber - Numéro du Pokémon (1 ou 2)
+         * @param {Object} pokemon - Objet contenant les données du Pokémon
+         */
+        function displayPokemon(pokemonNumber, pokemon) {
+            // Sélectionner les éléments HTML correspondants
+            const prefix = `pokemon${pokemonNumber}`;
+            
+            // Mettre à jour le nom
+            document.getElementById(`${prefix}-name`).textContent = pokemon.name;
+            
+            // Mettre à jour l'image
+            document.getElementById(`${prefix}-image`).src = pokemon.sprite;
+            
+            // Mettre à jour les stats d'attaque et défense
+            document.getElementById(`${prefix}-attack`).textContent = pokemon.attack;
+            document.getElementById(`${prefix}-defense`).textContent = pokemon.defense;
+            
+            // Mettre à jour les barres de vie et mana
+            updateBars(pokemonNumber);
+        }
+
+        /**
+         * Met à jour les barres de vie et de mana d'un Pokémon
+         * @param {number} pokemonNumber - Numéro du Pokémon (1 ou 2)
+         */
+        function updateBars(pokemonNumber) {
+            const pokemon = gameState[`pokemon${pokemonNumber}`];
+            const prefix = `pokemon${pokemonNumber}`;
+
+            // Calculer les pourcentages
+            const hpPercent = (pokemon.currentHp / pokemon.maxHp) * 100;
+            const manaPercent = (pokemon.currentMana / pokemon.maxMana) * 100;
+
+            // Mettre à jour la barre de vie
+            const hpBar = document.getElementById(`${prefix}-hp-bar`);
+            hpBar.style.width = `${hpPercent}%`;
+            document.getElementById(`${prefix}-hp-text`).textContent = 
+                `${pokemon.currentHp}/${pokemon.maxHp}`;
+
+            // Changer la couleur de la barre de vie selon le pourcentage
+            hpBar.classList.remove('high', 'medium', 'low');
+            if (hpPercent > 50) {
+                hpBar.classList.add('high');
+            } else if (hpPercent > 25) {
+                hpBar.classList.add('medium');
+            } else {
+                hpBar.classList.add('low');
+            }
+
+            // Mettre à jour la barre de mana
+            const manaBar = document.getElementById(`${prefix}-mana-bar`);
+            manaBar.style.width = `${manaPercent}%`;
+            document.getElementById(`${prefix}-mana-text`).textContent = 
+                `${pokemon.currentMana}/${pokemon.maxMana}`;
+        }
+
+        /* ========================================
+           SYSTÈME DE COMBAT
+        ======================================== */
+        
+        /**
+         * Exécute une attaque simple
+         * - Inflige des dégâts
+         * - Recharge du mana
+         */
+        function basicAttack() {
+            if (gameState.gameOver) return;
+
+            const attacker = gameState[`pokemon${gameState.currentTurn}`];
+            const defenderNumber = gameState.currentTurn === 1 ? 2 : 1;
+            const defender = gameState[`pokemon${defenderNumber}`];
+
+            // Animation d'attaque
+            animateAttack(gameState.currentTurn);
+
+            // Calculer les dégâts
+            const damage = CONFIG.BASIC_ATTACK_DAMAGE;
+            defender.currentHp = Math.max(0, defender.currentHp - damage);
+
+            // Recharger le mana de l'attaquant
+            attacker.currentMana = Math.min(
+                attacker.maxMana, 
+                attacker.currentMana + CONFIG.BASIC_MANA_GAIN
+            );
+
+            // Animation de dégâts sur le défenseur
+            animateDamage(defenderNumber);
+
+            // Mettre à jour l'affichage
+            updateBars(gameState.currentTurn);
+            updateBars(defenderNumber);
+
+            // Ajouter au log
+            addLog(
+                `${attacker.name} utilise Attaque Simple ! ${damage} dégâts infligés. +${CONFIG.BASIC_MANA_GAIN} mana !`,
+                'attack'
+            );
+
+            // Vérifier la victoire
+            if (checkVictory()) return;
+
+            // Passer au tour suivant
+            nextTurn();
+        }
+
+        /**
+         * Exécute une attaque magique
+         * - Inflige plus de dégâts
+         * - Coûte du mana
+         */
+        function magicAttack() {
+            if (gameState.gameOver) return;
+
+            const attacker = gameState[`pokemon${gameState.currentTurn}`];
+            const defenderNumber = gameState.currentTurn === 1 ? 2 : 1;
+            const defender = gameState[`pokemon${defenderNumber}`];
+
+            // Vérifier si assez de mana
+            if (attacker.currentMana < CONFIG.MAGIC_MANA_COST) {
+                addLog(`${attacker.name} n'a pas assez de mana ! (${attacker.currentMana}/${CONFIG.MAGIC_MANA_COST})`, 'attack');
+                return;
+            }
+
+            // Animation d'attaque
+            animateAttack(gameState.currentTurn);
+
+            // Consommer le mana
+            attacker.currentMana -= CONFIG.MAGIC_MANA_COST;
+
+            // Calculer les dégâts
+            const damage = CONFIG.MAGIC_ATTACK_DAMAGE;
+            defender.currentHp = Math.max(0, defender.currentHp - damage);
+
+            // Animation de dégâts sur le défenseur
+            animateDamage(defenderNumber);
+
+            // Mettre à jour l'affichage
+            updateBars(gameState.currentTurn);
+            updateBars(defenderNumber);
+
+            // Ajouter au log
+            addLog(
+                `${attacker.name} utilise Attaque Magique ! ${damage} dégâts infligés ! -${CONFIG.MAGIC_MANA_COST} mana.`,
+                'attack'
+            );
+
+            // Vérifier la victoire
+            if (checkVictory()) return;
+
+            // Passer au tour suivant
+            nextTurn();
+        }
+
+        /**
+         * Passe au tour du Pokémon suivant
+         */
+        function nextTurn() {
+            // Alterner entre joueur 1 et joueur 2
+            gameState.currentTurn = gameState.currentTurn === 1 ? 2 : 1;
+            updateTurnIndicator();
+        }
+
+        /**
+         * Met à jour l'indicateur visuel du tour actuel
+         */
+        function updateTurnIndicator() {
+            const pokemon = gameState[`pokemon${gameState.currentTurn}`];
+            document.getElementById('turn-indicator').textContent = 
+                `🎯 Tour de ${pokemon.name.toUpperCase()}`;
+
+            // Ajouter bordure dorée sur la carte active
+            document.getElementById('pokemon1-card').classList.remove('active-turn');
+            document.getElementById('pokemon2-card').classList.remove('active-turn');
+            document.getElementById(`pokemon${gameState.currentTurn}-card`).classList.add('active-turn');
+        }
+
+        /**
+         * Vérifie si un Pokémon a gagné
+         * @returns {boolean} true si la partie est terminée
+         */
+        function checkVictory() {
+            if (gameState.pokemon1.currentHp <= 0) {
+                endGame(2);
+                return true;
+            }
+            if (gameState.pokemon2.currentHp <= 0) {
+                endGame(1);
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Termine la partie et affiche le vainqueur
+         * @param {number} winner - Numéro du Pokémon gagnant
+         */
+        function endGame(winner) {
+            gameState.gameOver = true;
+            const winnerPokemon = gameState[`pokemon${winner}`];
+
+            // Désactiver les boutons d'action
+            document.getElementById('btn-basic-attack').disabled = true;
+            document.getElementById('btn-magic-attack').disabled = true;
+
+            // Afficher le message de victoire dans le log
+            addLog(`🏆 ${winnerPokemon.name.toUpperCase()} GAGNE LE COMBAT ! 🏆`, 'victory');
+
+            // Afficher la modal de victoire
+            document.getElementById('victory-message').textContent = 
+                `${winnerPokemon.name} remporte la victoire !`;
+            document.getElementById('victory-modal').classList.add('active');
+
+            // Afficher le bouton de nouvelle partie
+            document.getElementById('btn-restart').style.display = 'block';
+        }
+
+        /* ========================================
+           ANIMATIONS
+        ======================================== */
+        
+        /**
+         * Anime l'attaque d'un Pokémon
+         * @param {number} pokemonNumber - Numéro du Pokémon qui attaque
+         */
+        function animateAttack(pokemonNumber) {
+            const card = document.getElementById(`pokemon${pokemonNumber}-card`);
+            card.classList.add('attacking');
+            
+            // Retirer la classe après l'animation
+            setTimeout(() => {
+                card.classList.remove('attacking');
+            }, 500);
+        }
+
+        /**
+         * Anime les dégâts reçus par un Pokémon
+         * @param {number} pokemonNumber - Numéro du Pokémon qui reçoit les dégâts
+         */
+        function animateDamage(pokemonNumber) {
+            const card = document.getElementById(`pokemon${pokemonNumber}-card`);
+            card.classList.add('damaged');
+            
+            setTimeout(() => {
+                card.classList.remove('damaged');
+            }, 500);
+        }
+
+        /* ========================================
+           LOG DE COMBAT
+        ======================================== */
+        
+        /**
+         * Ajoute un message au log de combat
+         * @param {string} message - Le message à afficher
+         * @param {string} type - Type de message (attack, heal, victory)
+         */
+        function addLog(message, type = 'attack') {
+            const logContainer = document.getElementById('log-container');
+            
+            // Créer l'élément de log
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = message;
+            
+            // Ajouter au début du container
+            logContainer.insertBefore(logEntry, logContainer.firstChild);
+            
+            // Limiter à 10 messages maximum
+            while (logContainer.children.length > 10) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        /* ========================================
+           GESTIONNAIRES D'ÉVÉNEMENTS
+        ======================================== */
+        
+        // Bouton Attaque Simple
+        document.getElementById('btn-basic-attack').addEventListener('click', basicAttack);
+
+        // Bouton Attaque Magique
+        document.getElementById('btn-magic-attack').addEventListener('click', magicAttack);
+
+        // Bouton Nouvelle Partie (dans le jeu)
+        document.getElementById('btn-restart').addEventListener('click', () => {
+            location.reload();
+        });
+
+        // Bouton Nouvelle Partie (dans la modal)
+        document.getElementById('btn-new-game').addEventListener('click', () => {
+            location.reload();
+        });
+
+        /* ========================================
+           DÉMARRAGE DU JEU
+        ======================================== */
+        
+        // Lancer le jeu au chargement de la page
+        window.addEventListener('DOMContentLoaded', initGame);
+
+        console.log("🎮 Script chargé, le jeu va démarrer...");
+    </script>
+</body>
+</html>
