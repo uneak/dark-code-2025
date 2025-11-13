@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Battle Game</title>
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Conteneur global pour aligner les cartes (Flexbox) -->
+    <div class="d-flex flex-wrap justify-content-center gap-4 p-4">
+
+        <!-- CARTE POKÉMON 1 -->
+        <!-- ID unique requis pour le ciblage JS de la carte parente -->
+        <div id="pokemon-card-1" class="card shadow-lg border-4 rounded-4 overflow-hidden" style="max-width: 18rem;">
+
+            <!-- Zone de l'image et du Type -->
+            <!-- CLASSE: js-card-header, ID de collapse unique -->
+            <div id="card-header-1" class="js-card-header position-relative p-4 d-flex flex-column align-items-center text-white">
+
+                <!-- CLASSE: js-pokemon-id / js-pokemon-name / js-pokemon-image / js-pokemon-type -->
+                <p class="js-pokemon-id h5 fw-bolder opacity-75 align-self-start">#???</p>
+                <h1 class="js-pokemon-name h3 fw-black text-capitalize mb-3 text-shadow-md letter-spacing-1">Loading...</h1>
+
+                <!-- Image du Pokémon -->
+                <div class="bg-white bg-opacity-50 p-2 rounded-circle shadow-lg border border-4 border-white">
+                    <img class="js-pokemon-image" src="" alt="Image du Pokémon" class="d-block mx-auto" style="width: 128px; height: 128px;">
+                </div>
+
+                <!-- Type Principal -->
+                <span class="js-pokemon-type position-absolute top-0 end-0 mt-3 me-3 badge rounded-pill bg-white text-dark text-opacity-75 fw-bold text-uppercase shadow-sm">Type</span>
+            </div>
+
+            <!-- Corps de la Carte -->
+            <div class="card-body bg-white p-4">
+
+                <!-- SECTION: BARRES D'ÉNERGIE (PV & MANA) -->
+                <div class="mb-3">
+                    <h3 class="fs-5 fw-bold text-dark border-bottom pb-1">Combat</h3>
+
+                    <!-- PV Bar -->
+                    <div class="d-flex flex-column mt-2">
+                        <div class="d-flex justify-content-between align-items-center fw-bold text-muted">
+                            <small class="text-uppercase">PV</small>
+                            <small class="js-pv-text text-dark">?? / ??</small>
+                        </div>
+                        <div class="progress mt-1">
+                            <div class="js-pv-progress progress-bar bg-danger" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="1"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mana Bar -->
+                    <div class="d-flex flex-column mt-2">
+                        <div class="d-flex justify-content-between align-items-center fw-bold text-muted">
+                            <small class="text-uppercase">MANA</small>
+                            <small class="js-mana-text text-dark">?? / ??</small>
+                        </div>
+                        <div class="progress mt-1">
+                            <div class="js-mana-progress progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3">
+
+                <!-- Stats (Collapse) -->
+                <div class="mb-3">
+                    <!-- Bouton Trigger : data-bs-target doit être unique pour cette carte (ex: #statsCollapse-1) -->
+                    <button class="btn btn-secondary w-100 fw-bold text-uppercase shadow-sm" type="button" 
+                            data-bs-toggle="collapse" data-bs-target="#statsCollapse-1" 
+                            aria-expanded="false" aria-controls="statsCollapse-1">
+                        Voir les Statistiques de Base
+                    </button>
+                    
+                    <!-- Contenu du Collapse : ID unique correspondant au trigger -->
+                    <div class="collapse mt-3" id="statsCollapse-1">
+                        <h3 class="fs-6 fw-bold text-secondary mb-2">Détails des Stats (Max 255)</h3>
+                        <!-- CLASSE: js-stats-container -->
+                        <div class="js-stats-container d-flex flex-column gap-1"> 
+                            <!-- Stats seront injectées ici -->
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3">
+
+                <!-- Capacités -->
+                <div>
+                    <h3 class="fs-5 fw-bold text-secondary mb-3">Capacités</h3>
+                    <!-- CLASSE: js-abilities-container -->
+                    <div class="js-abilities-container d-flex flex-wrap gap-2">
+                        <!-- Capacités seront injectées ici -->
+                    </div>
+                </div>
+                
+                <!-- SECTION: BOUTONS D'ATTAQUE -->
+                <div class="d-flex justify-content-between gap-2 pt-3">
+                    <button class="btn btn-secondary w-50 p-2 fw-bold text-uppercase shadow-sm" type="button">Attaque Normale</button>
+                    <!-- CLASSE: js-attack-special-button -->
+                    <button class="js-attack-special-button btn w-50 p-2 fw-bold text-white text-uppercase shadow-sm" type="button">Attaque Spéciale (20 Mana)</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CARTE POKÉMON 2 (Dupliquée et adaptées avec des IDs uniques pour le parent/collapse) -->
+        <div id="pokemon-card-2" class="card shadow-lg border-4 rounded-4 overflow-hidden" style="max-width: 18rem;">
+
+            <!-- Zone de l'image et du Type -->
+            <div id="card-header-2" class="js-card-header position-relative p-4 d-flex flex-column align-items-center text-white">
+
+                <!-- CLASSE: js-pokemon-id / js-pokemon-name / js-pokemon-image / js-pokemon-type -->
+                <p class="js-pokemon-id h5 fw-bolder opacity-75 align-self-start">#???</p>
+                <h1 class="js-pokemon-name h3 fw-black text-capitalize mb-3 text-shadow-md letter-spacing-1">Loading...</h1>
+
+                <!-- Image du Pokémon -->
+                <div class="bg-white bg-opacity-50 p-2 rounded-circle shadow-lg border border-4 border-white">
+                    <img class="js-pokemon-image" src="" alt="Image du Pokémon" class="d-block mx-auto" style="width: 128px; height: 128px;">
+                </div>
+
+                <!-- Type Principal -->
+                <span class="js-pokemon-type position-absolute top-0 end-0 mt-3 me-3 badge rounded-pill bg-white text-dark text-opacity-75 fw-bold text-uppercase shadow-sm">Type</span>
+            </div>
+
+            <!-- Corps de la Carte -->
+            <div class="card-body bg-white p-4">
+
+                <!-- SECTION: BARRES D'ÉNERGIE (PV & MANA) -->
+                <div class="mb-3">
+                    <h3 class="fs-5 fw-bold text-dark border-bottom pb-1">Combat</h3>
+
+                    <!-- PV Bar -->
+                    <div class="d-flex flex-column mt-2">
+                        <div class="d-flex justify-content-between align-items-center fw-bold text-muted">
+                            <small class="text-uppercase">PV</small>
+                            <small class="js-pv-text text-dark">?? / ??</small>
+                        </div>
+                        <div class="progress mt-1">
+                            <div class="js-pv-progress progress-bar bg-danger" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="1"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mana Bar -->
+                    <div class="d-flex flex-column mt-2">
+                        <div class="d-flex justify-content-between align-items-center fw-bold text-muted">
+                            <small class="text-uppercase">MANA</small>
+                            <small class="js-mana-text text-dark">?? / ??</small>
+                        </div>
+                        <div class="progress mt-1">
+                            <div class="js-mana-progress progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3">
+
+                <!-- Stats (Collapse) -->
+                <div class="mb-3">
+                    <!-- Bouton Trigger : data-bs-target doit être unique pour cette carte (ex: #statsCollapse-2) -->
+                    <button class="btn btn-secondary w-100 fw-bold text-uppercase shadow-sm" type="button" 
+                            data-bs-toggle="collapse" data-bs-target="#statsCollapse-2" 
+                            aria-expanded="false" aria-controls="statsCollapse-2">
+                        Voir les Statistiques de Base
+                    </button>
+                    
+                    <!-- Contenu du Collapse : ID unique correspondant au trigger -->
+                    <div class="collapse mt-3" id="statsCollapse-2">
+                        <h3 class="fs-6 fw-bold text-secondary mb-2">Détails des Stats (Max 255)</h3>
+                        <!-- CLASSE: js-stats-container -->
+                        <div class="js-stats-container d-flex flex-column gap-1"> 
+                            <!-- Stats seront injectées ici -->
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3">
+
+                <!-- Capacités -->
+                <div>
+                    <h3 class="fs-5 fw-bold text-secondary mb-3">Capacités</h3>
+                    <!-- CLASSE: js-abilities-container -->
+                    <div class="js-abilities-container d-flex flex-wrap gap-2">
+                        <!-- Capacités seront injectées ici -->
+                    </div>
+                </div>
+                
+                <!-- SECTION: BOUTONS D'ATTAQUE -->
+                <div class="d-flex justify-content-between gap-2 pt-3">
+                    <button class="btn btn-secondary w-50 p-2 fw-bold text-uppercase shadow-sm" type="button">Attaque Normale</button>
+                    <!-- CLASSE: js-attack-special-button -->
+                    <button class="js-attack-special-button btn w-50 p-2 fw-bold text-white text-uppercase shadow-sm" type="button">Attaque Spéciale (20 Mana)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <button id="btn-new-player" class="btn btn-primary" style="display: none;">NEXT</button>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

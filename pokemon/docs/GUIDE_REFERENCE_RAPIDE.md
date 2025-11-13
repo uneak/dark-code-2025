@@ -490,7 +490,7 @@ Ce projet permet de pratiquer :
 ### JavaScript
 - ✅ Variables (let, const)
 - ✅ Fonctions (déclaration, paramètres, retour)
-- ✅ Fonctions asynchrones (async/await)
+X ✅ Fonctions asynchrones (async/await)
 - ✅ Objets et propriétés
 - ✅ Tableaux
 - ✅ Conditions (if/else, ternaire)

@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Style personnalisé pour les ombres de texte dans l'en-tête Bootstrap */
+.text-shadow-md {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* S'assurer que le progress bar est visible et a une bonne hauteur */
+.progress {
+    height: 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* CSS additionnel pour la taille de texte la plus petite possible */
+.text-micro {
+    font-size: 0.65rem;
+    /* Ajustement de la taille de police */
+    font-weight: 500 !important;
+    /* Réduction du poids de la police pour les labels de stats */
+}
+
+
+
+
+
+/* AJOUTS POUR L'ANIMATION ET L'ÉTAT DU JOUEUR ACTIF */
+
+/* Application de la perspective pour les transformations 3D sur le conteneur */
+.d-flex.flex-wrap {
+    perspective: 1000px; /* Nécessaire pour les effets 3D (rotateY) */
+}
+
+/* Style de base pour toutes les cartes (état inactif par défaut) */
+.card {
+    /* Ajout des transitions pour une animation fluide */
+    transition: 
+        transform 0.4s ease-out, 
+        filter 0.4s ease-out, 
+        opacity 0.4s ease-out,
+        box-shadow 0.4s ease-out;
+
+    /* État par défaut (inactif) : légèrement plus petit et grisé */
+    transform: scale(0.95) rotateY(-5deg); /* Petit angle initial */
+    filter: grayscale(40%) opacity(0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; /* Ombre plus subtile */
+    cursor: default; /* Indique qu'elle n'est pas jouable */
+}
+
+/* Style de la carte lorsque le joueur est actif */
+.card.active-player {
+    /* Mise en avant : Agrandissement, rotation légère 3D et déplacement vers le haut */
+    transform: scale(1.05) rotateY(0deg) translateY(-15px); 
+    filter: grayscale(0%) opacity(1); /* Couleur et opacité normales */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35) !important; /* Ombre plus prononcée pour l'effet de profondeur */
+    cursor: pointer; /* Peut-être pour indiquer l'interactivité */
+    z-index: 10; /* Assure que la carte active est au-dessus */
+}
+
+/* Amélioration de l'animation de l'image (optionnel) */
+.card:hover:not(.active-player) .js-pokemon-image {
+    transform: scale(0.98);
+}
+.card.active-player .js-pokemon-image {
+    transition: transform 0.4s ease-out;
+}
+.card.active-player:hover .js-pokemon-image {
+    transform: scale(1.03); /* Petit zoom au survol pour la carte active */
+}
